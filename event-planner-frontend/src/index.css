@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@theme {
+  --color-primary: #4f378a;
+  --color-primary-container: #6750a4;
+  --color-secondary: #63597c;
+  --color-background: #fdf7ff;
+  --color-surface: #fdf7ff;
+  --color-on-surface: #1d1b20;
+  --color-gold: #D4AF37;
+  
+  --font-display: "Playfair Display", serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  
+  --radius-xl: 2rem;
+  --radius-2xl: 3rem;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-surface font-body;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@utility glass-card {
+  @apply bg-white/10 backdrop-blur-sm border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+}
+
+@utility elegant-button {
+  @apply rounded-full px-8 py-3 font-semibold transition-all duration-300 hover:scale-105 active:scale-95;
+}
+
+@utility elegant-button-primary {
+  @apply elegant-button bg-primary text-white shadow-lg shadow-primary/30;
+}
+
+@utility elegant-button-secondary {
+  @apply elegant-button border-2 border-primary text-primary hover:bg-primary hover:text-white;
+}
