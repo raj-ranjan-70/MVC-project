@@ -26,7 +26,7 @@ const LandingPage = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          className="relative z-10 max-w-6xl w-full glass-card p-8 md:p-12 rounded-[3rem] text-center border-white/20"
+          className="relative z-10 max-w-6xl w-full glass-card p-8 md:p-12 rounded-2xl text-center border-white/20"
         >
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
