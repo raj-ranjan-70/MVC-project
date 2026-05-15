@@ -28,8 +28,8 @@ pipeline {
                     echo 'Running migrations and seeders...'
                     // Wait for DB to be healthy
                     sh 'sleep 30' 
-                    sh 'docker exec event-planner-api php artisan migrate --force'
-                    sh 'docker exec event-planner-api php artisan db:seed --class=CategorySeeder'
+                    sh 'docker-compose exec -T backend php artisan migrate --force'
+                    sh 'docker-compose exec -T backend php artisan db:seed --class=CategorySeeder'
                 }
             }
         }
