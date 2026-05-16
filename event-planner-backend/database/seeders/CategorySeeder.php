@@ -22,11 +22,16 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            Category::create([
-                'name' => $cat['name'],
-                'type' => $cat['type'],
-                'slug' => Str::slug($cat['name'])
-            ]);
+
+            $slug = Str::slug($cat['name']);
+
+            Category::updateOrCreate(
+                ['slug' => $slug],
+                [
+                    'name' => $cat['name'],
+                    'type' => $cat['type']
+                ]
+            );
         }
     }
 }
