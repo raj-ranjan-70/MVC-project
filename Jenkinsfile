@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -16,6 +17,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building and starting containers...'
+
                     sh 'docker-compose down'
                     sh 'docker-compose up --build -d'
                 }
@@ -25,10 +27,23 @@ pipeline {
         stage('Post-Deployment Tasks') {
             steps {
                 script {
-                    echo 'Running migrations and seeders...'
-                    // Wait for DB to be healthy
-                    sh 'sleep 30' 
+
+                    echo 'Waiting for database health...'
+
+                    sh '''
+                    until [ "$(docker inspect -f {{.State.Health.Status}} $(docker-compose ps -q db))" = "healthy" ];
+                    do
+                      echo "Waiting for database..."
+                      sleep 5
+                    done
+                    '''
+
+                    echo 'Running migrations...'
+
                     sh 'docker-compose exec -T backend php artisan migrate --force'
+
+                    echo 'Running seeders...'
+
                     sh 'docker-compose exec -T backend php artisan db:seed --force'
                 }
             }
@@ -39,8 +54,9 @@ pipeline {
         success {
             echo 'Pipeline completed successfully!'
         }
+
         failure {
-            echo 'Pipeline failed. Check the logs.'
+            echo 'Pipeline failed. Check logs.'
         }
     }
 }
