@@ -44,3 +44,24 @@
 @utility elegant-button-secondary {
   @apply elegant-button border-2 border-primary text-primary hover:bg-primary hover:text-white;
 }
+
+/* Chat Page Layout Dimensions */
+.chat-container-layout {
+  height: calc(100vh - 5rem) !important;
+  margin: -2rem !important;
+  display: flex !important;
+  background-color: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.chat-sidebar-layout {
+  width: 100% !important;
+}
+
+@media (min-width: 768px) {
+  .chat-sidebar-layout {
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+  }
+}
