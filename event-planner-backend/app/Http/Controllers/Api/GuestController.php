@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Guest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\RSVPInvitationMail;
 
 class GuestController extends Controller
 {
@@ -73,11 +76,45 @@ class GuestController extends Controller
             return response()->json(['error' => 'Guest does not have a valid email address configured.'], 422);
         }
 
-        // Simulate sending email
-        \Illuminate\Support\Facades\Log::info("RSVP Invitation email simulated successfully to: {$guest->email} for Event: {$guest->event->title}");
+        try {
+            // Queue the professional luxury-style mailable
+            Mail::to($guest->email)->queue(new RSVPInvitationMail($guest));
 
-        return response()->json([
-            'message' => "RSVP email invitation sent successfully to {$guest->name} ({$guest->email})!"
+            // Automatically set status to pending upon successful queue dispatch
+            $guest->update(['rsvp_status' => 'pending']);
+
+            Log::info("RSVP Invitation email successfully queued to: {$guest->email} for Event: {$guest->event->title}");
+
+            return response()->json([
+                'message' => "RSVP email invitation sent successfully to {$guest->name} ({$guest->email})!"
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Failed to queue RSVP invitation email to {$guest->email}: " . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to dispatch invitation email. Please check SMTP / mail configuration settings in .env.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle public single-click RSVP response actions from email CTAs (Accept/Decline)
+     */
+    public function publicRsvp(Request $request, Guest $guest, $status)
+    {
+        if (!in_array($status, ['confirmed', 'declined'])) {
+            abort(404, 'Invalid RSVP status');
+        }
+
+        // Update the guest status directly in the database
+        $guest->update(['rsvp_status' => $status]);
+
+        Log::info("Guest {$guest->name} has successfully responded with status '{$status}' to Event: {$guest->event->title} via email CTA.");
+
+        // Return a gorgeous visual response view
+        return view('emails.rsvp-public-response', [
+            'guest' => $guest,
+            'event' => $guest->event,
+            'status' => $status
         ]);
     }
 }

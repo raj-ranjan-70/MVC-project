@@ -42,6 +42,11 @@ const EventDetailsPage = () => {
   const { register: registerGuest, handleSubmit: handleGuestSubmit, reset: resetGuestForm, formState: { errors: guestErrors } } = useForm();
   const [submittingGuest, setSubmittingGuest] = useState(false);
 
+  // Queued RSVP Email States
+  const [sendingEmails, setSendingEmails] = useState({});
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedGuestForEmail, setSelectedGuestForEmail] = useState(null);
+
   // Vendor Filtering States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -130,16 +135,28 @@ const EventDetailsPage = () => {
   };
 
   const onSendRSVPEmail = async (guest) => {
+    setSelectedGuestForEmail(guest);
+    setEmailModalOpen(true);
+  };
+
+  const triggerRsvpEmail = async () => {
+    if (!selectedGuestForEmail) return;
+    const guest = selectedGuestForEmail;
+    setEmailModalOpen(false);
+    
+    setSendingEmails(prev => ({ ...prev, [guest.id]: true }));
     try {
       const res = await api.post(`/guests/${guest.id}/rsvp-email`);
       showToast(res.data.message || `RSVP Invitation sent successfully to ${guest.email}!`);
       
-      // Update status to pending (simulated on frontend too)
       setGuests(guests.map(g => g.id === guest.id ? { ...g, rsvp_status: 'pending' } : g));
     } catch (err) {
       console.error(err);
-      const errMsg = err.response?.data?.error || 'Failed to send RSVP email.';
+      const errMsg = err.response?.data?.error || err.response?.data?.message || 'Failed to send RSVP email.';
       showToast(errMsg, 'error');
+    } finally {
+      setSendingEmails(prev => ({ ...prev, [guest.id]: false }));
+      setSelectedGuestForEmail(null);
     }
   };
 
@@ -441,11 +458,16 @@ const EventDetailsPage = () => {
                             <td className="py-4 px-4 text-right space-x-2">
                               {guest.email && (
                                 <button 
+                                  disabled={sendingEmails[guest.id]}
                                   onClick={() => onSendRSVPEmail(guest)}
                                   title="Send RSVP Email invitation link"
-                                  className="w-8 h-8 rounded-full bg-primary/5 hover:bg-primary hover:text-white transition-all text-primary inline-flex items-center justify-center"
+                                  className={`w-8 h-8 rounded-full bg-primary/5 hover:bg-primary hover:text-white transition-all text-primary inline-flex items-center justify-center ${sendingEmails[guest.id] ? 'opacity-50 cursor-not-allowed hover:bg-primary/5 hover:text-primary' : ''}`}
                                 >
-                                  <Mail size={14} />
+                                  {sendingEmails[guest.id] ? (
+                                    <Loader2 className="animate-spin" size={14} />
+                                  ) : (
+                                    <Mail size={14} />
+                                  )}
                                 </button>
                               )}
                               <button 
@@ -780,6 +802,91 @@ const EventDetailsPage = () => {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* RSVP Invitation Email Confirmation Modal */}
+      <AnimatePresence>
+        {emailModalOpen && selectedGuestForEmail && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setEmailModalOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            ></motion.div>
+
+            {/* Modal Box */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100"
+            >
+              {/* Header */}
+              <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Mail size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-display font-bold text-gray-800">Dispatch RSVP Invitation</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Send real email invite to guest</p>
+                  </div>
+                </div>
+                <button type="button" onClick={() => setEmailModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-all">
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-8 space-y-5">
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  You are about to transmit a professional luxury RSVP invitation email to:
+                </p>
+
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-400 font-medium">Guest Name</span>
+                    <span className="font-bold text-gray-700">{selectedGuestForEmail.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-400 font-medium">Email Address</span>
+                    <span className="font-bold text-primary font-mono">{selectedGuestForEmail.email}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-400 font-medium">Event Title</span>
+                    <span className="font-bold text-gray-700">{event.title}</span>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 p-4 rounded-2xl flex items-start space-x-3 text-xs text-amber-800 leading-relaxed border border-amber-100">
+                  <Info size={16} className="shrink-0 mt-0.5 text-amber-600" />
+                  <span>The system will automatically set the guest's RSVP response status to <strong>Pending</strong>. They can accept or decline directly from the email with a single click.</span>
+                </div>
+
+                {/* Footer buttons */}
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                  <button 
+                    type="button" 
+                    onClick={() => setEmailModalOpen(false)} 
+                    className="px-6 py-2.5 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={triggerRsvpEmail}
+                    className="elegant-button-primary py-2.5 px-6 text-xs flex items-center font-bold shadow-md hover:shadow-lg"
+                  >
+                    <Send className="mr-2" size={14} />
+                    Confirm & Send Real Email
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}
