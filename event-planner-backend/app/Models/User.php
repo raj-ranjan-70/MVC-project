@@ -61,6 +61,6 @@ class User extends Authenticatable
      */
     public function vendor()
     {
-        return $this->hasOne(Vendor::class);
+        return $this->hasOne(VendorService::class, 'user_id');
     }
 }
