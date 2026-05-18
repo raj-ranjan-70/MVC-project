@@ -22,8 +22,13 @@ class MessageController extends Controller
         $userId = $user->id;
 
         if ($user->role === 'planner') {
-            // Planners can chat with all active/verified vendors
-            $contacts = User::where('role', 'vendor')
+            // Planners can chat with only those vendors whose services they have booked
+            $eventIds = \App\Models\Event::where('user_id', $userId)->pluck('id');
+            $vendorServiceIds = ServiceBooking::whereIn('event_id', $eventIds)->pluck('vendor_service_id');
+            $vendorUserIds = VendorService::whereIn('id', $vendorServiceIds)->pluck('user_id');
+
+            $contacts = User::whereIn('id', $vendorUserIds)
+                ->where('role', 'vendor')
                 ->where('is_active', true)
                 ->with('vendor')
                 ->get();
