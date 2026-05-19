@@ -110,23 +110,136 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-24 px-8 md:px-16 bg-primary relative overflow-hidden text-white">
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl md:text-6xl font-display font-bold mb-8">
-            Start Planning Your <br /> Perfect Event Today.
+      {/* Visual CTA Section with Illustration */}
+      <section className="relative overflow-hidden bg-[#e6eff6] pt-24 pb-0 flex flex-col items-center justify-between min-h-[600px] md:min-h-[750px] border-b border-gray-100">
+        {/* Background Landscape Illustration */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/aura-footer-bg.png" 
+            alt="Garden Landscape" 
+            className="w-full h-full object-cover object-bottom"
+          />
+          {/* Subtle soft sky blue/lavender gradient top overlay to blend the text nicely */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#e6eff6]/80 via-transparent to-transparent"></div>
+        </div>
+
+        {/* CTA Text */}
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+          <h2 className="text-4xl md:text-5xl font-display font-bold mb-4 text-[#2c3e50] tracking-tight">
+            For every dream celebration.
           </h2>
-          <p className="text-primary-container text-xl mb-12">
-            Join exclusive planners and discerning couples who trust our platform to bring their most ambitious visions to life with effortless grace.
+          <p className="text-gray-600 md:text-md mb-8 max-w-2xl mx-auto leading-relaxed font-medium">
+            Have questions or just want to see how Aura can help? Reach out anytime, we'll guide you every step of the way.
           </p>
-          <Link to="/signup" className="bg-white text-primary px-12 py-5 rounded-full font-bold text-lg shadow-xl hover:bg-gray-100 transition-colors">
-            Begin Your Journey
+          <Link 
+            to="/signup" 
+            className="inline-flex items-center space-x-2 bg-white text-gray-900 font-bold px-8 py-3.5 rounded-full hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-sm border border-gray-200/50"
+          >
+            <span>Match with an expert</span>
+            <ArrowRight size={16} className="text-gray-900" />
           </Link>
         </div>
-        {/* Abstract shapes for background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full -ml-48 -mb-48 blur-3xl"></div>
+
+        {/* Massive Bold Aura Text */}
+        <div className="relative w-full overflow-hidden select-none pointer-events-none mt-20 z-10">
+          <h1 className="text-center font-display text-[14rem] sm:text-[18rem] md:text-[25rem] lg:text-[28rem] font-black text-white leading-none tracking-tighter uppercase opacity-95">
+            aura
+          </h1>
+        </div>
       </section>
+
+      {/* Clean Modern Footer */}
+      <footer className="bg-white pt-20 pb-8 px-8 md:px-16 border-t border-gray-100 text-gray-700">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+          {/* Brand Column */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl font-display font-bold text-gray-900 tracking-tight">aura</span>
+            </div>
+            <p className="text-sm text-gray-400 font-medium max-w-xs">
+              For every beautiful milestone. Beautiful blueprints, dynamic guest orchestrations, and secure curator matching.
+            </p>
+            <div>
+              <Link 
+                to="/signup" 
+                className="inline-flex bg-gray-900 text-white font-bold px-6 py-2.5 rounded-full hover:bg-gray-800 transition-all text-xs shadow-md"
+              >
+                Get started today
+              </Link>
+            </div>
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Follow us</p>
+              <div className="flex items-center space-x-3">
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all">
+                  <span className="font-bold text-xs">in</span>
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all">
+                  <span className="font-bold text-xs">ig</span>
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all">
+                  <span className="font-bold text-xs">fb</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Links Column 1 */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">Our focus areas</h4>
+            <ul className="space-y-3 text-xs text-gray-400 font-medium">
+              <li><a href="#" className="hover:text-primary transition-colors">Weddings</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Corporate Galas</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Birthday Bashes</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Anniversary Soirees</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Charity Events</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Styled Shoots</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Private Dinners</a></li>
+            </ul>
+          </div>
+
+          {/* Links Column 2 */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">Toolkit</h4>
+            <ul className="space-y-3 text-xs text-gray-400 font-medium">
+              <li><a href="#" className="hover:text-primary transition-colors">Guest Orchestrator</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Budget Layouts</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Service Marketplace</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Timeline Curation</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Specification Editor</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Concierge Support</a></li>
+            </ul>
+          </div>
+
+          {/* Links Column 3 */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">About</h4>
+            <ul className="space-y-3 text-xs text-gray-400 font-medium">
+              <li><a href="#" className="hover:text-primary transition-colors">Our Story</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Join our team</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Press</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Contact us</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">FAQs</a></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Footer Bottom Row */}
+        <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400 font-medium">
+          <div className="flex items-center space-x-6">
+            <a href="#" className="hover:text-primary transition-colors">Terms & Conditions</a>
+            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+          </div>
+          <div>
+            <span>Aura, 2026</span>
+          </div>
+        </div>
+
+        {/* Legal Disclaimer */}
+        <div className="mt-6 text-[10px] text-gray-300 leading-relaxed font-medium">
+          Aura is a private software company not affiliated with nor endorsed by any government agency. Aura does not charge clients for any official forms, however, we charge fees for the use of Aura care, software, and dynamic event layout orchestration tools.
+        </div>
+      </footer>
     </div>
   );
 };
