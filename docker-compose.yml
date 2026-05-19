@@ -1,45 +1,120 @@
+version: '3.9'
+
 services:
+
   backend:
     build:
       context: ./event-planner-backend
+    container_name: event-planner-backend
     ports:
       - "8000:8000"
     environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+
+      # Database
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
       - DB_DATABASE=event_planner_DB
       - DB_USERNAME=event_user
       - DB_PASSWORD=StrongPassword123
+
+      # Queue
+      - QUEUE_CONNECTION=database
+
+      # Mail Configuration
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=587
+      - MAIL_USERNAME=rajranjan707077@gmail.com
+      - MAIL_PASSWORD=hlwvtjysqpuxhjjx
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS=rajranjan707077@gmail.com
+      - MAIL_FROM_NAME="Aura Events"
+
     depends_on:
       db:
         condition: service_healthy
+
+    restart: unless-stopped
+
+  queue:
+    build:
+      context: ./event-planner-backend
+    container_name: event-planner-queue
+
+    command: php artisan queue:work --tries=3 --timeout=90
+
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+
+      # Database
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=event_planner_DB
+      - DB_USERNAME=event_user
+      - DB_PASSWORD=StrongPassword123
+
+      # Queue
+      - QUEUE_CONNECTION=database
+
+      # Mail Configuration
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=587
+      - MAIL_USERNAME=rajranjan707077@gmail.com
+      - MAIL_PASSWORD=hlwvtjysqpuxhjjx
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS=rajranjan707077@gmail.com
+      - MAIL_FROM_NAME="Aura Events"
+
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
     restart: unless-stopped
 
   frontend:
     build:
       context: ./event-planner-frontend
+    container_name: event-planner-frontend
+
     ports:
       - "80:80"
+
     depends_on:
       - backend
+
     restart: unless-stopped
 
   db:
     image: mysql:8.0
+    container_name: event-planner-db
+
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSuperRootPassword" ]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+
     environment:
       - MYSQL_DATABASE=event_planner_DB
       - MYSQL_USER=event_user
       - MYSQL_PASSWORD=StrongPassword123
       - MYSQL_ROOT_PASSWORD=SuperRootPassword
+
     volumes:
       - db_data:/var/lib/mysql
+
+    ports:
+      - "3306:3306"
+
     restart: unless-stopped
 
 volumes:
