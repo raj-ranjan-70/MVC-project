@@ -505,7 +505,11 @@ const EventDetailsPage = () => {
                     }}
                     className="elegant-button-secondary py-1.5 px-4 text-xs font-bold flex items-center hover:bg-primary hover:text-white"
                   >
-                    <Pencil size={12} className="mr-1.5" />
+                    {isSuspended ? (
+                      <Lock size={12} className="mr-1.5 text-gray-400 shrink-0" />
+                    ) : (
+                      <Pencil size={12} className="mr-1.5" />
+                    )}
                     Edit Specifications
                   </button>
                 )}
@@ -592,7 +596,11 @@ const EventDetailsPage = () => {
                     }}
                     className="elegant-button-secondary py-1.5 px-3 text-xs font-bold flex items-center hover:bg-primary hover:text-white"
                   >
-                    <Plus size={12} className="mr-1.5" />
+                    {isSuspended ? (
+                      <Lock size={12} className="mr-1.5 text-gray-400 shrink-0" />
+                    ) : (
+                      <Plus size={12} className="mr-1.5" />
+                    )}
                     Add Curators
                   </button>
                 )}
@@ -642,8 +650,9 @@ const EventDetailsPage = () => {
                         }
                         setActiveTab('hire');
                       }} 
-                      className="elegant-button-primary py-2 px-4 text-xs font-bold inline-flex items-center"
+                      className="elegant-button-primary py-2 px-4 text-xs font-bold inline-flex items-center gap-1.5"
                     >
+                      {isSuspended && <Lock size={12} className="text-white/80 shrink-0" />}
                       Browse Creators
                     </button>
                   )}
