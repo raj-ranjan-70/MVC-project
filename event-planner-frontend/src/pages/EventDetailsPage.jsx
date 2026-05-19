@@ -22,12 +22,18 @@ import {
   Sparkles,
   Award,
   ShieldAlert,
-  Pencil
+  Pencil,
+  Lock
 } from 'lucide-react';
 import api from '../services/api';
+import useAuthStore from '../store/useAuthStore';
+import Toastify from 'toastify-js';
+import "toastify-js/src/toastify.css";
 
 const EventDetailsPage = () => {
   const { id } = useParams();
+  const { user } = useAuthStore();
+  const isSuspended = user?.role === 'planner' && !user?.is_active;
   const [event, setEvent] = useState(null);
   const [guests, setGuests] = useState([]);
   const [vendorServices, setVendorServices] = useState([]);
@@ -407,17 +413,59 @@ const EventDetailsPage = () => {
           Workspace
         </button>
         <button 
-          onClick={() => setActiveTab('guests')} 
-          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'guests' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+          onClick={() => {
+            if (isSuspended) {
+              Toastify({
+                text: "Your account is currently suspended. You cannot view or manage guests. Please contact the administrator.",
+                duration: 4500,
+                gravity: "top",
+                position: "center",
+                style: {
+                  background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                  borderRadius: "16px",
+                  boxShadow: "0 10px 15px -3px rgba(239, 68, 68, 0.2)",
+                  fontFamily: "Outfit, Inter, sans-serif",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  padding: "12px 24px",
+                }
+              }).showToast();
+              return;
+            }
+            setActiveTab('guests');
+          }} 
+          className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'guests' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-800'} flex items-center gap-1.5`}
         >
           Guests ({guests.length})
+          {isSuspended && <Lock size={13} className="text-gray-400 shrink-0" />}
         </button>
         {!isCompleted && (
           <button 
-            onClick={() => setActiveTab('hire')} 
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'hire' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+            onClick={() => {
+              if (isSuspended) {
+                Toastify({
+                  text: "Your account is currently suspended. You cannot book vendor curators. Please contact the administrator.",
+                  duration: 4500,
+                  gravity: "top",
+                  position: "center",
+                  style: {
+                    background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                    borderRadius: "16px",
+                    boxShadow: "0 10px 15px -3px rgba(239, 68, 68, 0.2)",
+                    fontFamily: "Outfit, Inter, sans-serif",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    padding: "12px 24px",
+                  }
+                }).showToast();
+                return;
+              }
+              setActiveTab('hire');
+            }} 
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'hire' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-800'} flex items-center gap-1.5`}
           >
             Direct Curator Booking
+            {isSuspended && <Lock size={13} className="text-gray-400 shrink-0" />}
           </button>
         )}
       </div>
@@ -434,7 +482,27 @@ const EventDetailsPage = () => {
                 <h3 className="text-xl font-display font-bold text-gray-800">Event Specifications</h3>
                 {!isCompleted && (
                   <button 
-                    onClick={openEditSpecModal}
+                    onClick={() => {
+                      if (isSuspended) {
+                        Toastify({
+                          text: "Your account is currently suspended. You cannot edit event specifications. Please contact the administrator.",
+                          duration: 4500,
+                          gravity: "top",
+                          position: "center",
+                          style: {
+                            background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 15px -3px rgba(239, 68, 68, 0.2)",
+                            fontFamily: "Outfit, Inter, sans-serif",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            padding: "12px 24px",
+                          }
+                        }).showToast();
+                        return;
+                      }
+                      openEditSpecModal();
+                    }}
                     className="elegant-button-secondary py-1.5 px-4 text-xs font-bold flex items-center hover:bg-primary hover:text-white"
                   >
                     <Pencil size={12} className="mr-1.5" />
@@ -501,7 +569,27 @@ const EventDetailsPage = () => {
                 <h3 className="text-xl font-display font-bold text-gray-800">Hired Curators</h3>
                 {!isCompleted && (
                   <button 
-                    onClick={() => setActiveTab('hire')}
+                    onClick={() => {
+                      if (isSuspended) {
+                        Toastify({
+                          text: "Your account is currently suspended. You cannot book vendor curators. Please contact the administrator.",
+                          duration: 4500,
+                          gravity: "top",
+                          position: "center",
+                          style: {
+                            background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                            borderRadius: "16px",
+                            boxShadow: "0 10px 15px -3px rgba(239, 68, 68, 0.2)",
+                            fontFamily: "Outfit, Inter, sans-serif",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            padding: "12px 24px",
+                          }
+                        }).showToast();
+                        return;
+                      }
+                      setActiveTab('hire');
+                    }}
                     className="elegant-button-secondary py-1.5 px-3 text-xs font-bold flex items-center hover:bg-primary hover:text-white"
                   >
                     <Plus size={12} className="mr-1.5" />
@@ -533,7 +621,27 @@ const EventDetailsPage = () => {
                   <p className="text-xs text-gray-400 mb-4">No services booked for this masterpiece yet.</p>
                   {!isCompleted && (
                     <button 
-                      onClick={() => setActiveTab('hire')} 
+                      onClick={() => {
+                        if (isSuspended) {
+                          Toastify({
+                            text: "Your account is currently suspended. You cannot book vendor curators. Please contact the administrator.",
+                            duration: 4500,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                              background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                              borderRadius: "16px",
+                              boxShadow: "0 10px 15px -3px rgba(239, 68, 68, 0.2)",
+                              fontFamily: "Outfit, Inter, sans-serif",
+                              fontSize: "14px",
+                              fontWeight: "600",
+                              padding: "12px 24px",
+                            }
+                          }).showToast();
+                          return;
+                        }
+                        setActiveTab('hire');
+                      }} 
                       className="elegant-button-primary py-2 px-4 text-xs font-bold inline-flex items-center"
                     >
                       Browse Creators
