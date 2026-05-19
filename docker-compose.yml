@@ -20,7 +20,12 @@ services:
     build:
       context: ./event-planner-backend
 
-    command: php artisan queue:work --tries=3 --timeout=90
+    command: >
+      sh -c "
+        php artisan optimize:clear &&
+        php artisan config:cache &&
+        php artisan queue:work --tries=3 --timeout=90
+      "
 
     env_file:
       - ./event-planner-backend/.env
