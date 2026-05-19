@@ -199,8 +199,15 @@ const ChatPage = () => {
                     <p className={`text-xs font-bold truncate leading-tight ${isSelected ? 'text-white' : 'text-gray-800'}`}>
                       {contact.vendor?.business_name || contact.name}
                     </p>
-                    <p className={`text-[10px] truncate mt-0.5 ${isSelected ? 'text-white/70' : 'text-gray-400'}`}>
-                      {contact.role === 'vendor' ? 'Service Vendor' : 'Event Planner'}
+                    <p className={`text-[10px] truncate mt-0.5 ${isSelected ? 'text-white/70' : 'text-gray-400'} flex items-center`}>
+                      <span>
+                        {contact.role === 'admin' ? 'Administrator' : contact.role === 'vendor' ? 'Service Vendor' : 'Event Planner'}
+                      </span>
+                      {contact.role === 'vendor' && !contact.is_active && (
+                        <span className={`ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${isSelected ? 'bg-white/20 text-white' : 'bg-red-100 text-red-600'}`}>
+                          Suspended
+                        </span>
+                      )}
                     </p>
                   </div>
 
@@ -237,11 +244,16 @@ const ChatPage = () => {
                 </button>
                 
                 <div>
-                  <h4 className="text-sm font-bold text-gray-800 leading-tight">
-                    {selectedContact.vendor?.business_name || selectedContact.name}
+                  <h4 className="text-sm font-bold text-gray-800 leading-tight flex items-center">
+                    <span>{selectedContact.vendor?.business_name || selectedContact.name}</span>
+                    {selectedContact.role === 'vendor' && !selectedContact.is_active && (
+                      <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-600 rounded text-[9px] font-bold uppercase tracking-wider">
+                        Suspended
+                      </span>
+                    )}
                   </h4>
                   <p className="text-[10px] text-gray-400 capitalize mt-0.5">
-                    {selectedContact.role} • {selectedContact.email}
+                    {selectedContact.role === 'admin' ? 'Administrator' : selectedContact.role} • {selectedContact.email}
                   </p>
                 </div>
               </div>

@@ -86,6 +86,7 @@ const DashboardLayout = () => {
           { name: 'Planners', path: '/planners', icon: Users },
           { name: 'Vendors', path: '/admin/vendors', icon: Truck },
           { name: 'Events', path: '/admin/events', icon: Calendar },
+          { name: 'Messages', path: '/chat', icon: MessageSquare },
         ];
       case 'vendor':
         return [

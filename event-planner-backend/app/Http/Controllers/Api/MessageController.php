@@ -21,7 +21,10 @@ class MessageController extends Controller
         $user = $request->user();
         $userId = $user->id;
 
-        if ($user->role === 'planner') {
+        if ($user->role === 'admin') {
+            // Admin can chat with all vendors (active or suspended)
+            $contacts = User::where('role', 'vendor')->get();
+        } else if ($user->role === 'planner') {
             // Planners can chat with only those vendors whose services they have booked
             $eventIds = \App\Models\Event::where('user_id', $userId)->pluck('id');
             $vendorServiceIds = ServiceBooking::whereIn('event_id', $eventIds)->pluck('vendor_service_id');
@@ -56,6 +59,10 @@ class MessageController extends Controller
             if ($contacts->isEmpty()) {
                 $contacts = User::where('role', 'planner')->get();
             }
+
+            // Always add Admins to the Vendor's contact list so they can chat with Admin
+            $admins = User::where('role', 'admin')->get();
+            $contacts = $admins->concat($contacts);
         }
 
         // Include unread message counts for each contact

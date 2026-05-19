@@ -13,7 +13,11 @@ class MarketplaceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = VendorService::with('user')->where('is_available', true);
+        $query = VendorService::with('user')
+            ->where('is_available', true)
+            ->whereHas('user', function($q) {
+                $q->where('is_active', true);
+            });
 
         if ($request->has('category') && $request->category !== 'All') {
             $query->where('category', $request->category);

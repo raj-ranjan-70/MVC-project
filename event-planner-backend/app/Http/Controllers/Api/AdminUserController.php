@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Message;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
@@ -33,7 +35,50 @@ class AdminUserController extends Controller
             'role' => 'in:admin,planner,vendor'
         ]);
 
+        $oldIsActive = $user->is_active;
+
         $user->update($validated);
+
+        // Check if status is changed for a vendor
+        if (isset($validated['is_active']) && $user->role === 'vendor') {
+            $newIsActive = $validated['is_active'];
+            if ($oldIsActive && !$newIsActive) {
+                // Suspended: Send message from Admin
+                $adminId = $request->user()->id;
+                Message::create([
+                    'sender_id' => $adminId,
+                    'receiver_id' => $user->id,
+                    'message' => 'Your account has been suspended by the administrator. Please chat here if you have any questions or would like to submit an appeal.',
+                    'is_read' => false,
+                ]);
+
+                Notification::create([
+                    'user_id' => $user->id,
+                    'title' => 'Account Suspended',
+                    'message' => 'Your account has been suspended by the administrator.',
+                    'type' => 'message',
+                    'is_read' => false,
+                ]);
+            } else if (!$oldIsActive && $newIsActive) {
+                // Reactivated: Send message from Admin
+                $adminId = $request->user()->id;
+                Message::create([
+                    'sender_id' => $adminId,
+                    'receiver_id' => $user->id,
+                    'message' => 'Your account has been reactivated. Thank you for your patience!',
+                    'is_read' => false,
+                ]);
+
+                Notification::create([
+                    'user_id' => $user->id,
+                    'title' => 'Account Reactivated',
+                    'message' => 'Your account has been reactivated by the administrator.',
+                    'type' => 'message',
+                    'is_read' => false,
+                ]);
+            }
+        }
+
         return response()->json($user);
     }
 
