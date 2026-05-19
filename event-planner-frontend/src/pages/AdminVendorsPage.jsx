@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle, XCircle, Trash2, Eye } from 'lucide-react';
 import api from '../services/api';
 
@@ -23,12 +23,52 @@ const AdminVendorsPage = () => {
     }
   };
 
+  // Suspension modal states
+  const [suspensionModalOpen, setSuspensionModalOpen] = useState(false);
+  const [selectedVendorForSuspension, setSelectedVendorForSuspension] = useState(null);
+  const [suspensionReason, setSuspensionReason] = useState('');
+  const [suspending, setSuspending] = useState(false);
+
   const handleUpdateStatus = async (vendorId, is_active) => {
     try {
       await api.put(`/admin/users/${vendorId}`, { is_active });
       fetchVendors();
     } catch (error) {
       console.error('Failed to update vendor status', error);
+    }
+  };
+
+  const confirmSuspension = async () => {
+    if (!selectedVendorForSuspension) return;
+    setSuspending(true);
+    try {
+      await api.put(`/admin/users/${selectedVendorForSuspension.id}`, { 
+        is_active: false,
+        suspension_reason: suspensionReason.trim()
+      });
+      fetchVendors();
+      setSuspensionModalOpen(false);
+      setSelectedVendorForSuspension(null);
+      setSuspensionReason('');
+    } catch (error) {
+      console.error('Failed to suspend vendor', error);
+      alert('Failed to suspend vendor. Please try again.');
+    } finally {
+      setSuspending(false);
+    }
+  };
+
+  const handleToggleStatus = (vendor) => {
+    if (vendor.is_active) {
+      // Open suspension modal
+      setSelectedVendorForSuspension(vendor);
+      setSuspensionReason('');
+      setSuspensionModalOpen(true);
+    } else {
+      // Activating suspended vendor
+      if (window.confirm(`Are you sure you want to reactivate ${vendor.name}'s profile?`)) {
+        handleUpdateStatus(vendor.id, true);
+      }
     }
   };
 
@@ -119,7 +159,7 @@ const AdminVendorsPage = () => {
                     <td className="py-4 px-4 text-right">
                       <div className="flex justify-end space-x-2">
                         <button 
-                          onClick={() => handleUpdateStatus(vendor.id, !vendor.is_active)}
+                          onClick={() => handleToggleStatus(vendor)}
                           className={`p-2 rounded-lg transition-colors ${vendor.is_active ? 'text-red-500 hover:bg-red-50' : 'text-green-500 hover:bg-green-50'}`}
                           title={vendor.is_active ? 'Suspend Vendor' : 'Activate Vendor'}
                         >
@@ -152,6 +192,63 @@ const AdminVendorsPage = () => {
           </div>
         )}
       </div>
+
+      {/* Suspension Confirmation Modal */}
+      <AnimatePresence>
+        {suspensionModalOpen && selectedVendorForSuspension && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl relative border border-gray-100"
+            >
+              <h3 className="text-xl font-display font-bold text-gray-800">Suspend Vendor Profile</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Are you sure you want to suspend <strong className="text-gray-800 font-bold">{selectedVendorForSuspension.name}</strong>?
+              </p>
+              <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                This will temporarily disable their account, hide all their service listings from planners, and send them a chat message indicating the reason.
+              </p>
+              
+              <div className="mt-4">
+                <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                  Reason for Suspension
+                </label>
+                <textarea
+                  value={suspensionReason}
+                  onChange={(e) => setSuspensionReason(e.target.value)}
+                  placeholder="e.g. Multiple client complaints regarding late delivery or non-responsiveness..."
+                  rows={4}
+                  className="w-full bg-gray-50 border-none rounded-2xl p-3.5 text-xs focus:ring-2 focus:ring-primary/20 text-gray-850 placeholder:text-gray-405 resize-none border border-gray-100"
+                  required
+                />
+              </div>
+              
+              <div className="mt-6 flex space-x-3 justify-end">
+                <button
+                  onClick={() => {
+                    setSuspensionModalOpen(false);
+                    setSelectedVendorForSuspension(null);
+                    setSuspensionReason('');
+                  }}
+                  disabled={suspending}
+                  className="px-4 py-2.5 text-xs rounded-xl font-bold hover:bg-gray-100 transition-colors text-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSuspension}
+                  disabled={suspending || !suspensionReason.trim()}
+                  className="px-5 py-2.5 text-xs rounded-xl font-bold bg-red-600 hover:bg-red-700 transition-colors text-white shadow-lg shadow-red-600/20 flex items-center space-x-1.5 disabled:opacity-50"
+                >
+                  {suspending ? 'Suspending...' : 'Suspend Profile'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

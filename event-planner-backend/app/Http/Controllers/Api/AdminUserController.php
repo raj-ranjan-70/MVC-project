@@ -32,12 +32,15 @@ class AdminUserController extends Controller
         $user = User::findOrFail($id);
         $validated = $request->validate([
             'is_active' => 'boolean',
-            'role' => 'in:admin,planner,vendor'
+            'role' => 'in:admin,planner,vendor',
+            'suspension_reason' => 'nullable|string'
         ]);
 
         $oldIsActive = $user->is_active;
 
-        $user->update($validated);
+        // Strip suspension_reason before saving to user table since it's not a user column
+        $updateData = collect($validated)->except('suspension_reason')->toArray();
+        $user->update($updateData);
 
         // Check if status is changed for a vendor
         if (isset($validated['is_active']) && $user->role === 'vendor') {
@@ -45,17 +48,28 @@ class AdminUserController extends Controller
             if ($oldIsActive && !$newIsActive) {
                 // Suspended: Send message from Admin
                 $adminId = $request->user()->id;
+                $reason = $request->input('suspension_reason');
+                $messageText = 'Your account has been suspended by the administrator.';
+                if ($reason) {
+                    $messageText .= "\n\nReason for suspension:\n" . $reason;
+                }
+                $messageText .= "\n\nPlease chat here if you have any questions or would like to submit an appeal.";
+
                 Message::create([
                     'sender_id' => $adminId,
                     'receiver_id' => $user->id,
-                    'message' => 'Your account has been suspended by the administrator. Please chat here if you have any questions or would like to submit an appeal.',
+                    'message' => $messageText,
                     'is_read' => false,
                 ]);
 
+                $notifText = 'Your account has been suspended by the administrator.';
+                if ($reason) {
+                    $notifText .= ' Reason: ' . $reason;
+                }
                 Notification::create([
                     'user_id' => $user->id,
                     'title' => 'Account Suspended',
-                    'message' => 'Your account has been suspended by the administrator.',
+                    'message' => mb_strimwidth($notifText, 0, 100, '...'),
                     'type' => 'message',
                     'is_read' => false,
                 ]);
