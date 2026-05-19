@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -5,10 +6,77 @@ import {
   Wallet, 
   Truck, 
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Star
 } from 'lucide-react';
 
 const LandingPage = () => {
+  const testimonials = [
+    {
+      quote: "Aura transformed our wedding into a cinematic masterpiece. The curator matching was seamless and secure.",
+      author: "Eleanor & Sterling",
+      role: "Brides & Planners",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60",
+      rating: 5,
+      date: "October 2025"
+    },
+    {
+      quote: "The budget layout system gave us absolute clarity. We were able to manage high-end caterers without a single worry.",
+      author: "Maximilian K.",
+      role: "Corporate Lead, Horizon",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=60",
+      rating: 5,
+      date: "December 2025"
+    },
+    {
+      quote: "Absolute perfection. The dynamic timeline orchestration helped our team coordinate guest lists effortlessly.",
+      author: "Charlotte & Arthur",
+      role: "Exclusive Wedding",
+      avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=60",
+      rating: 5,
+      date: "January 2026"
+    },
+    {
+      quote: "Using Aura felt like having a personal luxury concierge. The chat notifications and workflow keep everyone aligned.",
+      author: "Sienna & James",
+      role: "Anniversary Soiree",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=60",
+      rating: 5,
+      date: "March 2026"
+    }
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isPaused, testimonials.length]);
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
@@ -106,6 +174,88 @@ const LandingPage = () => {
                 </p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section - Our wall of 💜 */}
+      <section className="py-24 px-8 md:px-16 bg-[#faf9fb]/60 relative overflow-hidden border-t border-b border-gray-100/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div>
+              <span className="text-xs font-bold text-[#b388ff] uppercase tracking-widest bg-[#b388ff]/10 px-4 py-1.5 rounded-full">Testimonials</span>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mt-4">
+                Our wall of 💜
+              </h2>
+            </div>
+            
+            {/* Carousel Navigation Buttons */}
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={handlePrev}
+                className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:border-[#b388ff] hover:text-[#b388ff] transition-all shadow-sm hover:shadow"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button 
+                onClick={handleNext}
+                className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:border-[#b388ff] hover:text-[#b388ff] transition-all shadow-sm hover:shadow"
+                aria-label="Next slide"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Carousel Viewport */}
+          <div 
+            className="overflow-hidden relative w-full"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            <motion.div 
+              animate={{ x: `-${currentIndex * (isMobile ? 100 : 50)}%` }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex w-full"
+            >
+              {testimonials.map((t, idx) => (
+                <div 
+                  key={idx} 
+                  className="w-full md:w-1/2 flex-shrink-0 px-3"
+                >
+                  <div className="glass-card p-8 md:p-10 rounded-3xl h-[340px] flex flex-col justify-between border border-gray-100/50 shadow-sm hover:shadow-md transition-all bg-white relative overflow-hidden group">
+                    {/* Soft background glow on hover */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#b388ff]/5 rounded-full filter blur-2xl group-hover:bg-[#b388ff]/10 transition-all duration-500 -mr-16 -mt-16"></div>
+                    
+                    {/* Stars */}
+                    <div className="flex items-center space-x-1 text-purple-600">
+                      {[...Array(t.rating)].map((_, i) => (
+                        <Star key={i} size={16} fill="currentColor" className="text-[#b388ff]" />
+                      ))}
+                    </div>
+
+                    {/* Review text */}
+                    <p className="text-gray-600 text-sm md:text-md italic leading-relaxed relative z-10 flex-grow mt-6">
+                      "{t.quote}"
+                    </p>
+
+                    {/* Author Profile */}
+                    <div className="flex items-center space-x-4 border-t border-gray-100/80 pt-6 mt-6">
+                      <img 
+                        src={t.avatar} 
+                        alt={t.author} 
+                        className="w-12 h-12 rounded-full object-cover border border-[#b388ff]/20 shadow-sm"
+                      />
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-sm">{t.author}</h4>
+                        <p className="text-xs text-gray-400 font-medium">{t.role} • <span className="text-[#b388ff] font-semibold">{t.date}</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
