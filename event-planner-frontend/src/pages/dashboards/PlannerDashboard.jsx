@@ -145,12 +145,15 @@ const PlannerDashboard = () => {
         <div className="space-y-8">
           <div className="glass-card p-8 rounded-3xl bg-primary text-white">
             <h3 className="text-xl font-display font-bold mb-4">Concierge Support</h3>
-            <p className="text-primary-container text-sm leading-relaxed mb-6">
+            <p className="text-white/80 text-sm leading-relaxed mb-6">
               Our specialists are ready to assist with your most ambitious visions.
             </p>
-            <button className="w-full py-3 bg-white text-primary rounded-full font-bold shadow-lg">
+            <Link 
+              to="/chat" 
+              className="w-full block py-3 bg-white text-primary rounded-full font-bold shadow-lg text-center hover:bg-gray-50 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+            >
               Contact Specialist
-            </button>
+            </Link>
           </div>
           
           <div className="glass-card p-8 rounded-3xl">
