@@ -5,7 +5,6 @@ services:
   backend:
     build:
       context: ./event-planner-backend
-    container_name: event-planner-backend
     ports:
       - "8000:8000"
     environment:
@@ -42,7 +41,6 @@ services:
   queue:
     build:
       context: ./event-planner-backend
-    container_name: event-planner-queue
 
     command: php artisan queue:work --tries=3 --timeout=90
 
@@ -82,7 +80,6 @@ services:
   frontend:
     build:
       context: ./event-planner-frontend
-    container_name: event-planner-frontend
 
     ports:
       - "80:80"
@@ -94,7 +91,6 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: event-planner-db
 
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSuperRootPassword" ]
