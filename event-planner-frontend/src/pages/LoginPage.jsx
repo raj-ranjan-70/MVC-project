@@ -23,11 +23,11 @@ const LoginPage = () => {
 
   return (
     <div 
-      className="h-screen w-screen relative flex items-center justify-end px-6 md:px-16 lg:px-24 bg-cover bg-center bg-no-repeat overflow-hidden"
+      className="h-screen w-screen relative flex items-center justify-center px-6 bg-cover bg-center bg-no-repeat overflow-hidden"
       style={{ backgroundImage: "url('/images/login-page-image.avif')" }}
     >
       {/* Background Dimming & Blur Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-black/40 to-black/60 backdrop-blur-[1px] z-0"></div>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-0"></div>
 
       {/* Floating Back Arrow Button */}
       <button 
@@ -39,8 +39,8 @@ const LoginPage = () => {
       </button>
 
       <motion.div 
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="max-w-md w-full relative z-10 my-auto"
       >
